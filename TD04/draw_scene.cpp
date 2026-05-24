@@ -16,6 +16,8 @@ IndexedMesh* rail;
 float sr{0.5};
 float rr{0.3};
 float sx{0.7};
+float POS_X_RAIL1{3};
+float POS_X_RAIL2{7};
 
 void drawGrid(){
 
@@ -69,7 +71,7 @@ myEngine.mvMatrixStack.popMatrix();
 
 
 myEngine.mvMatrixStack.pushMatrix();
-	Vector3D tr{3.0,5.0,rr+sr};
+	Vector3D tr{POS_X_RAIL1,5.0,rr+sr};
 	myEngine.mvMatrixStack.addTranslation(tr);
     Vector3D hm{sr,10,sr};
 	myEngine.mvMatrixStack.addHomothety(hm);
@@ -79,7 +81,7 @@ myEngine.mvMatrixStack.pushMatrix();
 myEngine.mvMatrixStack.popMatrix();
 
 myEngine.mvMatrixStack.pushMatrix();
-	Vector3D tr1{7.0,5.0,2*rr +sr/2};
+	Vector3D tr1{POS_X_RAIL2,5.0,2*rr +sr/2};
 	myEngine.mvMatrixStack.addTranslation(tr1);
 	myEngine.mvMatrixStack.addHomothety(hm);
     myEngine.setFlatColor(0.8,0.8,0.8);
