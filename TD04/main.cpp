@@ -3,7 +3,9 @@
 #include "glad/glad.h"
 #include "draw_scene.hpp"
 #include "tools/shaders.hpp"
+#include <json.hpp>
 #include <iostream>
+
 
 using namespace glbasimac;
 using namespace STP3D;
