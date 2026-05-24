@@ -3,13 +3,18 @@
 /// Camera parameters
 float angle_theta {45.0};      // Angle between x axis and viewpoint
 float angle_phy {30.0};      // Angle between z axis and viewpoint
-float dist_zoom {150.0};      // Distance between origin and viewpoint
+float dist_zoom {100.0};      // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
 GLBI_Convex_2D_Shape somePoints(3);
 GLBI_Convex_2D_Shape ground{3};
 GLBI_Convex_2D_Shape grid(3);
-IndexedMesh* sphere;
+IndexedMesh* rail;
+IndexedMesh* balast;
+
+float sr{0.5};
+float rr{0.5};
+float sx{0.5};
 
 void drawGrid(){
 
@@ -24,6 +29,8 @@ void drawGrid(){
 	grid.changeNature(GL_LINES);
 
 }
+
+
 void initScene() {
 	std::vector<float> points {0.0,0.0,0.0};
 	somePoints.initShape(points);
@@ -36,8 +43,48 @@ void initScene() {
 	ground.changeNature(GL_TRIANGLE_FAN);
 
 	drawGrid();
+
+	rail= basicCube(1.0f);
+	rail->createVAO();
+
+	balast= basicCylinder(6.0f,rr, 100,100);
+	balast->createVAO();
 }
 
+void drawStraightRail(){
+
+myEngine.mvMatrixStack.pushMatrix();
+	Vector3D tr{3.0,5.0,0.0};
+	myEngine.mvMatrixStack.addTranslation(tr);
+    Vector3D hm{sr,10,sr};
+	myEngine.mvMatrixStack.addHomothety(hm);
+    myEngine.setFlatColor(0.8,0.8,0.8);
+    myEngine.updateMvMatrix();
+	rail -> draw();
+myEngine.mvMatrixStack.popMatrix();
+
+myEngine.mvMatrixStack.pushMatrix();
+	Vector3D tr1{7.0,5.0,0.0};
+	myEngine.mvMatrixStack.addTranslation(tr1);
+	myEngine.mvMatrixStack.addHomothety(hm);
+    myEngine.setFlatColor(0.8,0.8,0.8);
+    myEngine.updateMvMatrix();
+	rail -> draw();
+myEngine.mvMatrixStack.popMatrix();
+
+for (int k{0}; k<=4; ++k){
+myEngine.mvMatrixStack.pushMatrix();
+	Vector3D tr2{8.0,(sx +k*(rr +2*sx)),0.0};
+	myEngine.mvMatrixStack.addTranslation(tr2);
+	Vector3D rt{0,0,1};
+	myEngine.mvMatrixStack.addRotation(M_PI/2,rt);
+    myEngine.setFlatColor(0.8,0.8,0.8);
+    myEngine.updateMvMatrix();
+	balast -> draw();
+myEngine.mvMatrixStack.popMatrix();
+}
+
+}
 
 void drawFrame() {
 	std::vector <float> origin {10.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
@@ -53,6 +100,8 @@ void drawScene() {
 
 	myEngine.setFlatColor(0.0,1.0f,0.0);
 	grid.drawShape();
+
+	drawStraightRail();
 	
 }
 
