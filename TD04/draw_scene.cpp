@@ -3,18 +3,19 @@
 /// Camera parameters
 float angle_theta {45.0};      // Angle between x axis and viewpoint
 float angle_phy {30.0};      // Angle between z axis and viewpoint
-float dist_zoom {100.0};      // Distance between origin and viewpoint
+float dist_zoom {50.0};      // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
 GLBI_Convex_2D_Shape somePoints(3);
 GLBI_Convex_2D_Shape ground{3};
 GLBI_Convex_2D_Shape grid(3);
-IndexedMesh* rail;
 IndexedMesh* balast;
+IndexedMesh* rail;
+
 
 float sr{0.5};
-float rr{0.5};
-float sx{0.5};
+float rr{0.3};
+float sx{0.7};
 
 void drawGrid(){
 
@@ -44,17 +45,31 @@ void initScene() {
 
 	drawGrid();
 
+	balast= basicCylinder(6.0f,rr, 100,100);
+	balast->createVAO();
+
 	rail= basicCube(1.0f);
 	rail->createVAO();
 
-	balast= basicCylinder(6.0f,rr, 100,100);
-	balast->createVAO();
+	
 }
 
 void drawStraightRail(){
+for (int k{0}; k<=4; ++k){
+myEngine.mvMatrixStack.pushMatrix();
+	Vector3D tr2{8.0,(sx + rr + k*(2*rr +2*sx)),rr};
+	myEngine.mvMatrixStack.addTranslation(tr2);
+	Vector3D rt{0,0,1};
+	myEngine.mvMatrixStack.addRotation(M_PI/2,rt);
+    myEngine.setFlatColor(0.96,0.96,0.86);
+    myEngine.updateMvMatrix();
+	balast -> draw();
+myEngine.mvMatrixStack.popMatrix();
+}
+
 
 myEngine.mvMatrixStack.pushMatrix();
-	Vector3D tr{3.0,5.0,0.0};
+	Vector3D tr{3.0,5.0,rr+sr};
 	myEngine.mvMatrixStack.addTranslation(tr);
     Vector3D hm{sr,10,sr};
 	myEngine.mvMatrixStack.addHomothety(hm);
@@ -64,7 +79,7 @@ myEngine.mvMatrixStack.pushMatrix();
 myEngine.mvMatrixStack.popMatrix();
 
 myEngine.mvMatrixStack.pushMatrix();
-	Vector3D tr1{7.0,5.0,0.0};
+	Vector3D tr1{7.0,5.0,2*rr +sr/2};
 	myEngine.mvMatrixStack.addTranslation(tr1);
 	myEngine.mvMatrixStack.addHomothety(hm);
     myEngine.setFlatColor(0.8,0.8,0.8);
@@ -72,17 +87,7 @@ myEngine.mvMatrixStack.pushMatrix();
 	rail -> draw();
 myEngine.mvMatrixStack.popMatrix();
 
-for (int k{0}; k<=4; ++k){
-myEngine.mvMatrixStack.pushMatrix();
-	Vector3D tr2{8.0,(sx +k*(rr +2*sx)),0.0};
-	myEngine.mvMatrixStack.addTranslation(tr2);
-	Vector3D rt{0,0,1};
-	myEngine.mvMatrixStack.addRotation(M_PI/2,rt);
-    myEngine.setFlatColor(0.8,0.8,0.8);
-    myEngine.updateMvMatrix();
-	balast -> draw();
-myEngine.mvMatrixStack.popMatrix();
-}
+
 
 }
 
