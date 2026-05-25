@@ -9,6 +9,7 @@ GLBI_Engine myEngine;
 GLBI_Convex_2D_Shape somePoints(3);
 GLBI_Convex_2D_Shape ground{3};
 GLBI_Convex_2D_Shape grid(3);
+GLBI_Convex_2D_Shape curvedRail (3);
 IndexedMesh* balast;
 IndexedMesh* rail;
 
@@ -53,6 +54,14 @@ void initScene() {
 	rail= basicCube(1.0f);
 	rail->createVAO();
 
+	std::vector<float> curvedRail1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRail1.insert(curvedRail1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRail1.insert(curvedRail1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
+	}
+	curvedRail.initShape(curvedRail1);
+
 	
 }
 
@@ -89,8 +98,15 @@ myEngine.mvMatrixStack.pushMatrix();
 	rail -> draw();
 myEngine.mvMatrixStack.popMatrix();
 
+}
 
-
+void drawCurveRail(){
+	myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.8,0.8,0.8);
+    curvedRail.changeNature(GL_TRIANGLE_STRIP);
+    myEngine.updateMvMatrix();
+    curvedRail.drawShape();
+	myEngine.mvMatrixStack.popMatrix();
 }
 
 void drawFrame() {
@@ -108,7 +124,9 @@ void drawScene() {
 	myEngine.setFlatColor(0.0,1.0f,0.0);
 	grid.drawShape();
 
-	drawStraightRail();
+	//drawStraightRail();
+
+	drawCurveRail();
 	
 }
 
