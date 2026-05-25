@@ -13,6 +13,10 @@ GLBI_Convex_2D_Shape curvedRailB1 (3);
 GLBI_Convex_2D_Shape curvedRailT1 (3);
 GLBI_Convex_2D_Shape curvedRailI1 (3);
 GLBI_Convex_2D_Shape curvedRailO1 (3);
+GLBI_Convex_2D_Shape curvedRailB2 (3);
+GLBI_Convex_2D_Shape curvedRailT2 (3);
+GLBI_Convex_2D_Shape curvedRailI2 (3);
+GLBI_Convex_2D_Shape curvedRailO2 (3);
 IndexedMesh* balast;
 IndexedMesh* rail;
 
@@ -37,6 +41,41 @@ void drawGrid(){
 
 }
 
+void initCurvedRail(float r, GLBI_Convex_2D_Shape& bottom, GLBI_Convex_2D_Shape& top, GLBI_Convex_2D_Shape& inside, GLBI_Convex_2D_Shape& outside){
+	std::vector<float> curvedRailBottom1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailBottom1.insert(curvedRailBottom1.end(),{(r-sr/2)*cosf(k*M_PI/20),(r-sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailBottom1.insert(curvedRailBottom1.end(),{(r+sr/2)*cosf(k*M_PI/20),(r+sr/2)*sinf(k*M_PI/20),0.0f});
+		
+	}
+	bottom.initShape(curvedRailBottom1);
+
+	std::vector<float> curvedRailTop1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailTop1.insert(curvedRailTop1.end(),{(r+sr/2)*cosf(k*M_PI/20),(r+sr/2)*sinf(k*M_PI/20),sr});
+		curvedRailTop1.insert(curvedRailTop1.end(),{(r-sr/2)*cosf(k*M_PI/20),(r-sr/2)*sinf(k*M_PI/20),sr});
+	}
+	top.initShape(curvedRailTop1);
+
+	std::vector<float> curvedRailInside1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailInside1.insert(curvedRailInside1.end(),{(r-sr/2)*cosf(k*M_PI/20),(r-sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailInside1.insert(curvedRailInside1.end(),{(r-sr/2)*cosf(k*M_PI/20),(r-sr/2)*sinf(k*M_PI/20),sr});
+	}
+	inside.initShape(curvedRailInside1);
+
+	std::vector<float> curvedRailOutside1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailOutside1.insert(curvedRailOutside1.end(),{(r+sr/2)*cosf(k*M_PI/20),(r+sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailOutside1.insert(curvedRailOutside1.end(),{(r+sr/2)*cosf(k*M_PI/20),(r+sr/2)*sinf(k*M_PI/20),sr});
+		
+	}
+	outside.initShape(curvedRailOutside1);
+}
 
 void initScene() {
 	std::vector<float> points {0.0,0.0,0.0};
@@ -57,40 +96,8 @@ void initScene() {
 	rail= basicCube(1.0f);
 	rail->createVAO();
 
-	std::vector<float> curvedRailBottom1{};
-
-	for (int k{0}; k<= 10;++k){
-		curvedRailBottom1.insert(curvedRailBottom1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
-		curvedRailBottom1.insert(curvedRailBottom1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
-		
-	}
-	curvedRailB1.initShape(curvedRailBottom1);
-
-	std::vector<float> curvedRailTop1{};
-
-	for (int k{0}; k<= 10;++k){
-		curvedRailTop1.insert(curvedRailTop1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),sr});
-		curvedRailTop1.insert(curvedRailTop1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),sr});
-	}
-	curvedRailT1.initShape(curvedRailTop1);
-
-	std::vector<float> curvedRailInside1{};
-
-	for (int k{0}; k<= 10;++k){
-		curvedRailInside1.insert(curvedRailInside1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
-		curvedRailInside1.insert(curvedRailInside1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),sr});
-	}
-	curvedRailI1.initShape(curvedRailInside1);
-
-	std::vector<float> curvedRailOutside1{};
-
-	for (int k{0}; k<= 10;++k){
-		curvedRailOutside1.insert(curvedRailOutside1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
-		curvedRailOutside1.insert(curvedRailOutside1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),sr});
-		
-	}
-	curvedRailO1.initShape(curvedRailOutside1);
-
+	initCurvedRail(POS_X_RAIL1, curvedRailB1, curvedRailT1, curvedRailI1, curvedRailO1);
+	initCurvedRail(POS_X_RAIL2, curvedRailB2, curvedRailT2, curvedRailI2, curvedRailO2);
 	
 }
 
@@ -136,11 +143,19 @@ void drawCurveRail(){
 	curvedRailT1.changeNature(GL_TRIANGLE_STRIP);
 	curvedRailI1.changeNature(GL_TRIANGLE_STRIP);
 	curvedRailO1.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailB2.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailT2.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailI2.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailO2.changeNature(GL_TRIANGLE_STRIP);
     myEngine.updateMvMatrix();
     curvedRailB1.drawShape();
 	curvedRailT1.drawShape();
 	curvedRailI1.drawShape();
 	curvedRailO1.drawShape();
+	curvedRailB2.drawShape();
+	curvedRailT2.drawShape();
+	curvedRailI2.drawShape();
+	curvedRailO2.drawShape();
 	myEngine.mvMatrixStack.popMatrix();
 }
 
