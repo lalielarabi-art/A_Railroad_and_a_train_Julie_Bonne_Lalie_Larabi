@@ -138,25 +138,39 @@ myEngine.mvMatrixStack.popMatrix();
 
 void drawCurveRail(){
 	myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.8,0.8,0.8);
-    curvedRailB1.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailT1.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailI1.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailO1.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailB2.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailT2.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailI2.changeNature(GL_TRIANGLE_STRIP);
-	curvedRailO2.changeNature(GL_TRIANGLE_STRIP);
-    myEngine.updateMvMatrix();
-    curvedRailB1.drawShape();
-	curvedRailT1.drawShape();
-	curvedRailI1.drawShape();
-	curvedRailO1.drawShape();
-	curvedRailB2.drawShape();
-	curvedRailT2.drawShape();
-	curvedRailI2.drawShape();
-	curvedRailO2.drawShape();
+		myEngine.setFlatColor(0.8,0.8,0.8);
+		curvedRailB1.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailT1.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailI1.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailO1.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailB2.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailT2.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailI2.changeNature(GL_TRIANGLE_STRIP);
+		curvedRailO2.changeNature(GL_TRIANGLE_STRIP);
+		myEngine.updateMvMatrix();
+		curvedRailB1.drawShape();
+		curvedRailT1.drawShape();
+		curvedRailI1.drawShape();
+		curvedRailO1.drawShape();
+		curvedRailB2.drawShape();
+		curvedRailT2.drawShape();
+		curvedRailI2.drawShape();
+		curvedRailO2.drawShape();
 	myEngine.mvMatrixStack.popMatrix();
+
+	std::vector<float> angle {M_PI/12,M_PI/4,5*M_PI/12};
+	std::vector<float> angle2 {M_PI/8,M_PI/4,3*M_PI/8};
+	for(int k{0}; k<=2;++k){
+		myEngine.mvMatrixStack.pushMatrix();
+			Vector3D tr{2*cos(angle2[k]),2*sin(angle2[k]) ,rr};
+			myEngine.mvMatrixStack.addTranslation(tr);
+			Vector3D rt{0,0,1};
+			myEngine.mvMatrixStack.addRotation(-M_PI/2+angle[k],rt);
+			myEngine.setFlatColor(0.96,0.96,0.86);
+			myEngine.updateMvMatrix();
+			balast -> draw();
+		myEngine.mvMatrixStack.popMatrix();
+	}
 }
 
 void drawFrame() {
