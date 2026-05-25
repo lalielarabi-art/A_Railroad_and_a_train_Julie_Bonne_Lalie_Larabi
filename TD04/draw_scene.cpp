@@ -9,7 +9,10 @@ GLBI_Engine myEngine;
 GLBI_Convex_2D_Shape somePoints(3);
 GLBI_Convex_2D_Shape ground{3};
 GLBI_Convex_2D_Shape grid(3);
-GLBI_Convex_2D_Shape curvedRail (3);
+GLBI_Convex_2D_Shape curvedRailB1 (3);
+GLBI_Convex_2D_Shape curvedRailT1 (3);
+GLBI_Convex_2D_Shape curvedRailI1 (3);
+GLBI_Convex_2D_Shape curvedRailO1 (3);
 IndexedMesh* balast;
 IndexedMesh* rail;
 
@@ -54,13 +57,39 @@ void initScene() {
 	rail= basicCube(1.0f);
 	rail->createVAO();
 
-	std::vector<float> curvedRail1{};
+	std::vector<float> curvedRailBottom1{};
 
 	for (int k{0}; k<= 10;++k){
-		curvedRail1.insert(curvedRail1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
-		curvedRail1.insert(curvedRail1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailBottom1.insert(curvedRailBottom1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailBottom1.insert(curvedRailBottom1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
+		
 	}
-	curvedRail.initShape(curvedRail1);
+	curvedRailB1.initShape(curvedRailBottom1);
+
+	std::vector<float> curvedRailTop1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailTop1.insert(curvedRailTop1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),sr});
+		curvedRailTop1.insert(curvedRailTop1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),sr});
+	}
+	curvedRailT1.initShape(curvedRailTop1);
+
+	std::vector<float> curvedRailInside1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailInside1.insert(curvedRailInside1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailInside1.insert(curvedRailInside1.end(),{(POS_X_RAIL1-sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1-sr/2)*sinf(k*M_PI/20),sr});
+	}
+	curvedRailI1.initShape(curvedRailInside1);
+
+	std::vector<float> curvedRailOutside1{};
+
+	for (int k{0}; k<= 10;++k){
+		curvedRailOutside1.insert(curvedRailOutside1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),0.0f});
+		curvedRailOutside1.insert(curvedRailOutside1.end(),{(POS_X_RAIL1+sr/2)*cosf(k*M_PI/20),(POS_X_RAIL1+sr/2)*sinf(k*M_PI/20),sr});
+		
+	}
+	curvedRailO1.initShape(curvedRailOutside1);
 
 	
 }
@@ -103,9 +132,15 @@ myEngine.mvMatrixStack.popMatrix();
 void drawCurveRail(){
 	myEngine.mvMatrixStack.pushMatrix();
     myEngine.setFlatColor(0.8,0.8,0.8);
-    curvedRail.changeNature(GL_TRIANGLE_STRIP);
+    curvedRailB1.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailT1.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailI1.changeNature(GL_TRIANGLE_STRIP);
+	curvedRailO1.changeNature(GL_TRIANGLE_STRIP);
     myEngine.updateMvMatrix();
-    curvedRail.drawShape();
+    curvedRailB1.drawShape();
+	curvedRailT1.drawShape();
+	curvedRailI1.drawShape();
+	curvedRailO1.drawShape();
 	myEngine.mvMatrixStack.popMatrix();
 }
 
