@@ -4,6 +4,7 @@
 #include "glbasimac/glbi_set_of_points.hpp"
 #include "glbasimac/glbi_convex_2D_shape.hpp"
 #include "tools/basic_mesh.hpp"
+#include <json.hpp>
 
 using namespace glbasimac;
 
@@ -29,3 +30,20 @@ void drawPan();
 
 void drawScene();
 
+struct Position
+{
+    int x {0};
+    int y {0};
+
+    // This macro generates the to_json and from_json functions for the Position struct
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Position, x, y)
+};
+
+struct GridConfig
+{
+    int size_grid {0};
+    Position origin {};
+    std::vector<Position> path {};
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(GridConfig, size_grid, origin, path)
+};
