@@ -21,7 +21,9 @@ GLBI_Convex_2D_Shape curvedRailT2 (3);
 GLBI_Convex_2D_Shape curvedRailI2 (3);
 GLBI_Convex_2D_Shape curvedRailO2 (3);
 IndexedMesh* balast;
-IndexedMesh* rail;
+IndexedMesh* cube;
+IndexedMesh* roue;
+
 
 
 float sr{0.5};
@@ -96,11 +98,16 @@ void initScene() {
 	balast= basicCylinder(6.0f,rr, 100,100);
 	balast->createVAO();
 
-	rail= basicCube(1.0f);
-	rail->createVAO();
+	cube = basicCube(1.0f);
+	cube->createVAO();
+
+	roue=basicCylinder(0.5f,1.0f,20.0f,1.0f);
+	roue -> createVAO();
 
 	initCurvedRail(POS_X_RAIL1, curvedRailB1, curvedRailT1, curvedRailI1, curvedRailO1);
 	initCurvedRail(POS_X_RAIL2, curvedRailB2, curvedRailT2, curvedRailI2, curvedRailO2);
+
+
 }
 
 void drawStraightRail(){
@@ -124,7 +131,7 @@ myEngine.mvMatrixStack.pushMatrix();
 	myEngine.mvMatrixStack.addHomothety(hm);
     myEngine.setFlatColor(0.8,0.8,0.8);
     myEngine.updateMvMatrix();
-	rail -> draw();
+	cube -> draw();
 myEngine.mvMatrixStack.popMatrix();
 
 myEngine.mvMatrixStack.pushMatrix();
@@ -133,7 +140,7 @@ myEngine.mvMatrixStack.pushMatrix();
 	myEngine.mvMatrixStack.addHomothety(hm);
     myEngine.setFlatColor(0.8,0.8,0.8);
     myEngine.updateMvMatrix();
-	rail -> draw();
+	cube -> draw();
 myEngine.mvMatrixStack.popMatrix();
 
 }
@@ -297,6 +304,93 @@ void drawCircuit() {
 
 }
 
+void drawGare(){
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr{static_cast<float>(config.origin.x*10),static_cast<float>(config.origin.y*10),5.0f};
+		myEngine.mvMatrixStack.addTranslation(tr);
+		Vector3D hm{10.0f,10.0f,10.0f};
+		myEngine.mvMatrixStack.addHomothety(hm);
+		myEngine.setFlatColor(0.96,0.96,0.86);
+		myEngine.updateMvMatrix();
+		cube -> draw();
+	myEngine.mvMatrixStack.popMatrix();
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr1{static_cast<float>(config.origin.x*10),static_cast<float>(config.origin.y*10),10.0f};
+		myEngine.mvMatrixStack.addTranslation(tr1);
+		Vector3D hm1{12.0f,12.0f,3.0f};
+		myEngine.mvMatrixStack.addHomothety(hm1);
+		myEngine.setFlatColor(0.0f,0.0f,0.0f);
+		myEngine.updateMvMatrix();
+		cube -> draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+}
+void drawTrain(){
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr1{static_cast<float>(config.path[0].x*10+5.0f),static_cast<float>(config.path[0].y*10+5.0f),3.0f};
+		myEngine.mvMatrixStack.addTranslation(tr1);
+		Vector3D hm1{4.0f,10.0f,5.0f};
+		myEngine.mvMatrixStack.addHomothety(hm1);
+		myEngine.setFlatColor(0.9f,0.9f,0.9f);
+		myEngine.updateMvMatrix();
+		cube -> draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr2{static_cast<float>(config.path[0].x*10+5.0f),static_cast<float>(config.path[0].y*10+5.0f),3.0f};
+		myEngine.mvMatrixStack.addTranslation(tr2);
+		Vector3D hm2{4.0f,10.0f,5.0f};
+		myEngine.mvMatrixStack.addHomothety(hm2);
+		myEngine.setFlatColor(0.9f,0.9f,0.9f);
+		myEngine.updateMvMatrix();
+		cube -> draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+	float cx = config.path[0].x*10+5.0f;
+	float cy = config.path[0].y*10+5.0f;
+
+
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr3{cx-2.0f, cy+3.0f, 1.0f+2*rr+sr};
+		myEngine.mvMatrixStack.addTranslation(tr3);
+		Vector3D rt{0,0,1};
+		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
+		myEngine.setFlatColor(0.2f,0.2f,0.2f);
+		myEngine.updateMvMatrix();
+		roue->draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr4{cx+2.5f, cy+3.0f, 1.0f+2*rr+sr};
+		myEngine.mvMatrixStack.addTranslation(tr4);
+		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
+		myEngine.setFlatColor(0.2f,0.2f,0.2f);
+		myEngine.updateMvMatrix();
+		roue->draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr5{cx-2.0f, cy-3.0f, 1.0f+2*rr+sr};
+		myEngine.mvMatrixStack.addTranslation(tr5);
+		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
+		myEngine.setFlatColor(0.2f,0.2f,0.2f);
+		myEngine.updateMvMatrix();
+		roue->draw();
+	myEngine.mvMatrixStack.popMatrix();
+
+	
+	myEngine.mvMatrixStack.pushMatrix();
+		Vector3D tr6{cx+2.5f, cy-3.0f, 1.0f+2*rr+sr};
+		myEngine.mvMatrixStack.addTranslation(tr6);
+		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
+		myEngine.setFlatColor(0.2f,0.2f,0.2f);
+		myEngine.updateMvMatrix();
+		roue->draw();
+	myEngine.mvMatrixStack.popMatrix();
+}
+
 void drawFrame() {
 	std::vector <float> origin {10.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
 	somePoints.initShape(origin);	
@@ -316,6 +410,8 @@ void drawScene() {
 
 	//drawCurveRail();
 	drawCircuit();
+	drawGare();
+	drawTrain();
 }
 
 
