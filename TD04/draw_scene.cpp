@@ -1,6 +1,9 @@
 #include "draw_scene.hpp"
 #include "json.hpp"
 #include "tools/texture.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "tools/stb_image.h"
+#include "glbasimac/glbi_texture.hpp"
 using json = nlohmann::json;
 #include <fstream>
 
@@ -21,14 +24,13 @@ GLBI_Convex_2D_Shape curvedRailB2 (3);
 GLBI_Convex_2D_Shape curvedRailT2 (3);
 GLBI_Convex_2D_Shape curvedRailI2 (3);
 GLBI_Convex_2D_Shape curvedRailO2 (3);
-IndexedMesh* balast;
-<<<<<<< HEAD
-IndexedMesh* cube;
-IndexedMesh* roue;
 
-Texture2D texSol;
-=======
+
+
+GLBI_Texture myTexture;
+
 IndexedMesh* rail;
+IndexedMesh* balast;
 IndexedMesh* cube;
 IndexedMesh* roue;
 IndexedMesh* phare;
@@ -39,7 +41,6 @@ bool isLightMoving {false};
 float lightX {-20.0f};             
 float lightY {-5.0f};              
 float lightZ {15.0f};
->>>>>>> origin/Julie
 
 float sr{0.5};
 float rr{0.3};
@@ -100,8 +101,21 @@ void initCurvedRail(float r, GLBI_Convex_2D_Shape& bottom, GLBI_Convex_2D_Shape&
 
 void initScene() {
 
-	Texture2D texSol("herbe.tga");
-	texSol.initTexture();
+	// Charger l'image avec stb_image
+	int w, h, n;
+	unsigned char* pixels = stbi_load("herbe2.tga", &w, &h, &n, 0);
+
+	// Créer la texture GPU
+	myTexture.createTexture();
+	myTexture.attachTexture();
+	myTexture.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	myTexture.loadImage(w, h, n, pixels);
+	myTexture.detachTexture();
+
+	// Libérer la mémoire CPU
+	stbi_image_free(pixels);
+	
+
 
 	std::vector<float> points {0.0,0.0,0.0};
 	somePoints.initShape(points);
@@ -139,9 +153,7 @@ void initScene() {
 	initCurvedRail(POS_X_RAIL1, curvedRailB1, curvedRailT1, curvedRailI1, curvedRailO1);
 	initCurvedRail(POS_X_RAIL2, curvedRailB2, curvedRailT2, curvedRailI2, curvedRailO2);
 
-<<<<<<< HEAD
 
-=======
 	
     myEngine.switchToPhongShading();
     Vector4D initialLight0Pos{lightX, lightY, lightZ, 1.0f}; 
@@ -170,7 +182,6 @@ void handleKeyboardInput(unsigned char key) {
     if (key == 'l' || key == 'L') {
         isLightMoving = !isLightMoving;
     }
->>>>>>> origin/Julie
 }
 
 void drawStraightRail(){
@@ -187,7 +198,6 @@ void drawStraightRail(){
 	}
 
 
-<<<<<<< HEAD
 myEngine.mvMatrixStack.pushMatrix();
 	Vector3D tr{POS_X_RAIL1,5.0,2*rr +sr/2};
 	myEngine.mvMatrixStack.addTranslation(tr);
@@ -206,26 +216,6 @@ myEngine.mvMatrixStack.pushMatrix();
     myEngine.updateMvMatrix();
 	cube -> draw();
 myEngine.mvMatrixStack.popMatrix();
-=======
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr{POS_X_RAIL1,5.0,2*rr +sr/2};
-		myEngine.mvMatrixStack.addTranslation(tr);
-		Vector3D hm{sr,10,sr};
-		myEngine.mvMatrixStack.addHomothety(hm);
-		myEngine.setFlatColor(0.8,0.8,0.8);
-		myEngine.updateMvMatrix();
-		rail -> draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr1{POS_X_RAIL2,5.0,2*rr +sr/2};
-		myEngine.mvMatrixStack.addTranslation(tr1);
-		myEngine.mvMatrixStack.addHomothety(hm);
-		myEngine.setFlatColor(0.8,0.8,0.8);
-		myEngine.updateMvMatrix();
-		rail -> draw();
-	myEngine.mvMatrixStack.popMatrix();
->>>>>>> origin/Julie
 
 }
 
@@ -413,11 +403,8 @@ void drawGare(){
 		myEngine.mvMatrixStack.addTranslation(tr);
 		Vector3D hm{10.0f,10.0f,10.0f};
 		myEngine.mvMatrixStack.addHomothety(hm);
-<<<<<<< HEAD
 		myEngine.setFlatColor(0.96,0.96,0.86);
-=======
 		myEngine.setFlatColor(0.8f,0.6f,0.4f);
->>>>>>> origin/Julie
 		myEngine.updateMvMatrix();
 		cube -> draw();
 	myEngine.mvMatrixStack.popMatrix();
@@ -426,82 +413,13 @@ void drawGare(){
 		myEngine.mvMatrixStack.addTranslation(tr1);
 		Vector3D hm1{12.0f,12.0f,3.0f};
 		myEngine.mvMatrixStack.addHomothety(hm1);
-<<<<<<< HEAD
 		myEngine.setFlatColor(0.0f,0.0f,0.0f);
-=======
 		myEngine.setFlatColor(0.6f,0.1f,0.1f);
->>>>>>> origin/Julie
 		myEngine.updateMvMatrix();
 		cube -> draw();
 	myEngine.mvMatrixStack.popMatrix();
 
 }
-<<<<<<< HEAD
-void drawTrain(){
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr1{static_cast<float>(config.path[0].x*10+5.0f),static_cast<float>(config.path[0].y*10+5.0f),3.0f};
-		myEngine.mvMatrixStack.addTranslation(tr1);
-		Vector3D hm1{4.0f,10.0f,5.0f};
-		myEngine.mvMatrixStack.addHomothety(hm1);
-		myEngine.setFlatColor(0.9f,0.9f,0.9f);
-		myEngine.updateMvMatrix();
-		cube -> draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr2{static_cast<float>(config.path[0].x*10+5.0f),static_cast<float>(config.path[0].y*10+5.0f),3.0f};
-		myEngine.mvMatrixStack.addTranslation(tr2);
-		Vector3D hm2{4.0f,10.0f,5.0f};
-		myEngine.mvMatrixStack.addHomothety(hm2);
-		myEngine.setFlatColor(0.9f,0.9f,0.9f);
-		myEngine.updateMvMatrix();
-		cube -> draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-	float cx = config.path[0].x*10+5.0f;
-	float cy = config.path[0].y*10+5.0f;
-
-
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr3{cx-2.0f, cy+3.0f, 1.0f+2*rr+sr};
-		myEngine.mvMatrixStack.addTranslation(tr3);
-		Vector3D rt{0,0,1};
-		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
-		myEngine.setFlatColor(0.2f,0.2f,0.2f);
-		myEngine.updateMvMatrix();
-		roue->draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr4{cx+2.5f, cy+3.0f, 1.0f+2*rr+sr};
-		myEngine.mvMatrixStack.addTranslation(tr4);
-		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
-		myEngine.setFlatColor(0.2f,0.2f,0.2f);
-		myEngine.updateMvMatrix();
-		roue->draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr5{cx-2.0f, cy-3.0f, 1.0f+2*rr+sr};
-		myEngine.mvMatrixStack.addTranslation(tr5);
-		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
-		myEngine.setFlatColor(0.2f,0.2f,0.2f);
-		myEngine.updateMvMatrix();
-		roue->draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-	
-	myEngine.mvMatrixStack.pushMatrix();
-		Vector3D tr6{cx+2.5f, cy-3.0f, 1.0f+2*rr+sr};
-		myEngine.mvMatrixStack.addTranslation(tr6);
-		myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
-		myEngine.setFlatColor(0.2f,0.2f,0.2f);
-		myEngine.updateMvMatrix();
-		roue->draw();
-	myEngine.mvMatrixStack.popMatrix();
-=======
 
 void drawTrain(){
     Vector3D rt{0, 0, 1};
@@ -609,7 +527,6 @@ void drawTrain(){
     myEngine.setLightIntensity(Vector3D(500.0f, 500.0f, 500.0f), 0);
 
 myEngine.mvMatrixStack.popMatrix();
->>>>>>> origin/Julie
 }
 
 void drawFrame() {
@@ -619,25 +536,20 @@ void drawFrame() {
 
 
 void drawScene() {
-<<<<<<< HEAD
-	/*/glPointSize(10.0);
-	texSol.loadTexture();
-	ground.drawShape();
-	texSol.unloadTexture();/*/
+
 	myEngine.activateTexturing(true);
-		texSol.loadTexture();
-		ground.drawShape();
-		texSol.unloadTexture();
+		myTexture.attachTexture();
+		myEngine.mvMatrixStack.pushMatrix();
+			Vector3D hm{100.0f, 100.0f, 0.1f};
+			myEngine.mvMatrixStack.addHomothety(hm);
+			myEngine.updateMvMatrix();
+			myEngine.setFlatColor(0.0f, 0.5f, 0.0f);
+			cube ->draw();
+		myEngine.mvMatrixStack.popMatrix();
+		myTexture.detachTexture();
 	myEngine.activateTexturing(false);
-=======
-	glPointSize(10.0);
 
 	myEngine.switchToFlatShading();
-    myEngine.setFlatColor(0.2, 0.0, 0.0);
-    ground.drawShape();
-    myEngine.setFlatColor(0.0, 1.0f, 0.0);
-    grid.drawShape();
->>>>>>> origin/Julie
 
     myEngine.mvMatrixStack.pushMatrix();
         Vector3D trLight{lightX, lightY, lightZ};
@@ -662,17 +574,6 @@ void drawScene() {
 	drawTrain();
 
     myEngine.switchToFlatShading();
-	//drawStraightRail();
 
-	//drawCurveRail();
-<<<<<<< HEAD
-	drawCircuit();
-	drawGare();
-	drawTrain();
-=======
 	
->>>>>>> origin/Julie
 }
-
-
-

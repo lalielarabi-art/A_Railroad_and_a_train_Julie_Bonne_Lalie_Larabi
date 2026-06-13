@@ -163,15 +163,15 @@ int main(int argc, char** argv)
 
 		updateScene(deltaTime);
 
-		/* Render begins here */
-		glClearColor(1.0f,1.0f,1.0f,0.0f);
 
-		// TO DO EX01 part 2
+		glClearColor(0.5f,0.7f,1.0f,1.0f);
+
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		
 
-		// TO DO EX01 part 3
+	
 
 		/* Fix camera position */
 		myEngine.mvMatrixStack.loadIdentity();
