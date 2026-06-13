@@ -47,7 +47,37 @@ float rr{0.3};
 float sx{0.7};
 float POS_X_RAIL1{3};
 float POS_X_RAIL2{7};
+float trainProgress {0.0f};  
+float trainSpeed {3.0f};
+bool isTrainMoving {false};
 
+GridConfig config ;
+struct TrainState {
+    float x, y, angle;
+};
+
+TrainState getTrainState() {
+    int size = config.path.size();
+    
+    float dist = trainProgress * size; 
+    
+    int segment = (int)(dist) % size;
+    float t = dist - (int)(dist); 
+    
+    int next = (segment + 1) % size;
+    
+    float x1 = config.path[segment].x * 10.0f + 5.0f;
+    float y1 = config.path[segment].y * 10.0f + 5.0f;
+    float x2 = config.path[next].x * 10.0f + 5.0f;
+    float y2 = config.path[next].y * 10.0f + 5.0f;
+    
+    float x = x1 + t * (x2 - x1);
+    float y = y1 + t * (y2 - y1);
+    
+    float angle = atan2f(y2 - y1, x2 - x1);
+    
+    return {x, y, angle};
+}
 
 void drawGrid(){
 
@@ -162,8 +192,8 @@ void initScene() {
     myEngine.setLightIntensity(initialLight0Intensity, 0);
 
 	myEngine.addALight(
-    Vector4D(0.0f, -1.0f, 2.0f, 0.0f),  // vient d'en haut
-    Vector3D(0.8f, 0.8f, 0.8f)           // blanc doux
+    Vector4D(0.0f, -1.0f, 2.0f, 0.0f),  
+    Vector3D(0.8f, 0.8f, 0.8f)           
 	);
 
     myEngine.switchToFlatShading(); 
@@ -176,11 +206,19 @@ void updateScene(float deltaTime) {
         lightX = -20.0f + 20.0f * cosf(lightAngle);
         lightY = -5.0f + 20.0f * sinf(lightAngle);
     }
+	 if (isTrainMoving && !config.path.empty()) {
+    trainProgress += trainSpeed * deltaTime / (config.path.size() * 10.0f);
+    if (trainProgress >= 1.0f) trainProgress -= 1.0f;
+}
 }
 
 void handleKeyboardInput(unsigned char key) {
     if (key == 'l' || key == 'L') {
         isLightMoving = !isLightMoving;
+    }
+	 if (key == 'd' || key == 'D') {
+        isTrainMoving = !isTrainMoving;
+		std::cout << "Train moving: " << isTrainMoving << std::endl;
     }
 }
 
@@ -274,8 +312,6 @@ void drawCurveRail(){
 		
 	
 }
-
-GridConfig config ;
 
 void loadCircuitFromJSON(const std::string& filename) {
     std::ifstream fichier(filename);
@@ -424,109 +460,102 @@ void drawGare(){
 void drawTrain(){
     Vector3D rt{0, 0, 1};
     Vector3D rx{1, 0, 0};
-    float cx = config.path[0].x*10 + 5.0f;
-    float cy = config.path[0].y*10 + 5.0f;
+    TrainState state = getTrainState();
     float rayonRoue = 0.8f;
     float zRoue = 2*rr + sr + rayonRoue;
     float hauteurCorps = zRoue + rayonRoue;
 
-    // === CORPS PRINCIPAL (long et bas) ===
+    
     myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy, hauteurCorps + 1.0f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{4.0f, 8.0f, 3.5f});
-        myEngine.setFlatColor(0.1f, 0.3f, 0.7f); // bleu
-        myEngine.updateMvMatrix();
-        cube->draw();
-    myEngine.mvMatrixStack.popMatrix();
+        myEngine.mvMatrixStack.addTranslation(Vector3D{state.x, state.y, 0.0f});
+        myEngine.mvMatrixStack.addRotation(state.angle + M_PI/2, rt);
 
-    // === CABINE (carrée, à l'arrière Y+) ===
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy + 2.f, hauteurCorps + 3.5f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{3.8f, 3.5f, 4.0f});
-        myEngine.setFlatColor(0.1f, 0.25f, 0.6f); // bleu foncé
-        myEngine.updateMvMatrix();
-        cube->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // Toit cabine
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy + 2.f, hauteurCorps + 5.5f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{4.2f, 4.0f, 0.4f});
-        myEngine.setFlatColor(0.05f, 0.15f, 0.4f); // bleu très foncé
-        myEngine.updateMvMatrix();
-        cube->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // === CHAUDIÈRE (cylindre horizontal à l'avant Y-) ===
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy - 1.5f, hauteurCorps + 1.5f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{0.6f, 0.6f, 1.f});
-        myEngine.setFlatColor(0.15f, 0.3f, 0.65f);
-        myEngine.updateMvMatrix();
-        roue->draw(); // cylindre horizontal
-    myEngine.mvMatrixStack.popMatrix();
-
-    // === CHEMINÉE VERTICALE ===
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy - 1.0f, hauteurCorps + 2.5f});
-        myEngine.mvMatrixStack.addRotation(M_PI/2, rx); // vertical
-        myEngine.mvMatrixStack.addHomothety(Vector3D{0.5f, 0.5f, 0.5f});
-        myEngine.setFlatColor(0.1f, 0.1f, 0.1f); // noir
-        myEngine.updateMvMatrix();
-        balast->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // Chapeau cheminée
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy - 1.0f, hauteurCorps + 5.5f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{0.8f, 0.8f, 0.3f});
-        myEngine.setFlatColor(0.1f, 0.1f, 0.1f);
-        myEngine.updateMvMatrix();
-        cube->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // === PARE-CHOC AVANT ===
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy - 4.f, hauteurCorps + 0.8f});
-        myEngine.mvMatrixStack.addHomothety(Vector3D{4.2f, 0.2f, 1.5f});
-        myEngine.setFlatColor(0.3f, 0.3f, 0.3f); // gris
-        myEngine.updateMvMatrix();
-        cube->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // === 4 ROUES ===
-    std::vector<std::pair<float,float>> posRoues = {
-        {cx - 2.0f, cy + 2.5f},  // arrière gauche
-        {cx + 2.0f, cy + 2.5f},  // arrière droit
-        {cx - 2.0f, cy - 2.5f},  // avant gauche
-        {cx + 2.0f, cy - 2.5f}   // avant droit
-    };
-    for(auto& pos : posRoues){
         myEngine.mvMatrixStack.pushMatrix();
-            myEngine.mvMatrixStack.addTranslation(Vector3D{pos.first, pos.second, zRoue});
-            myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
-            myEngine.mvMatrixStack.addHomothety(Vector3D{rayonRoue, 0.3f, rayonRoue});
-            myEngine.setFlatColor(0.1f, 0.1f, 0.1f);
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, 0.0f, hauteurCorps + 1.0f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{4.0f, 8.0f, 3.5f});
+            myEngine.setFlatColor(0.1f, 0.3f, 0.7f);
+            myEngine.updateMvMatrix();
+            cube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, 2.0f, hauteurCorps + 3.5f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{3.8f, 3.5f, 4.0f});
+            myEngine.setFlatColor(0.1f, 0.25f, 0.6f);
+            myEngine.updateMvMatrix();
+            cube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, 2.0f, hauteurCorps + 5.5f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{4.2f, 4.0f, 0.4f});
+            myEngine.setFlatColor(0.05f, 0.15f, 0.4f);
+            myEngine.updateMvMatrix();
+            cube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, -1.5f, hauteurCorps + 1.5f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{0.6f, 0.6f, 1.0f});
+            myEngine.setFlatColor(0.15f, 0.3f, 0.65f);
             myEngine.updateMvMatrix();
             roue->draw();
         myEngine.mvMatrixStack.popMatrix();
-    }
 
-    // === PHARE AVANT ===
-    myEngine.switchToFlatShading();
-    myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation(Vector3D{cx, cy - 4.2f, hauteurCorps + 1.5f});
-		myEngine.mvMatrixStack.addHomothety(Vector3D{3.f, 1.f, 3.f});
-        myEngine.setFlatColor(1.0f, 1.0f, 0.8f);
-        myEngine.updateMvMatrix();
-        phare->draw();
-    myEngine.mvMatrixStack.popMatrix();
-    myEngine.switchToPhongShading();
-    Vector4D currentLight0Pos{lightX, lightY, lightZ, 1.0f};
-    myEngine.setLightPosition(currentLight0Pos, 0);
-    myEngine.setLightIntensity(Vector3D(500.0f, 500.0f, 500.0f), 0);
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, -1.0f, hauteurCorps + 2.5f});
+            myEngine.mvMatrixStack.addRotation(M_PI/2, rx);
+            myEngine.mvMatrixStack.addHomothety(Vector3D{0.5f, 0.5f, 0.5f});
+            myEngine.setFlatColor(0.1f, 0.1f, 0.1f);
+            myEngine.updateMvMatrix();
+            balast->draw();
+        myEngine.mvMatrixStack.popMatrix();
 
-myEngine.mvMatrixStack.popMatrix();
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, -1.0f, hauteurCorps + 5.5f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{0.8f, 0.8f, 0.3f});
+            myEngine.setFlatColor(0.1f, 0.1f, 0.1f);
+            myEngine.updateMvMatrix();
+            cube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, -4.0f, hauteurCorps + 0.8f});
+            myEngine.mvMatrixStack.addHomothety(Vector3D{4.2f, 0.2f, 1.5f});
+            myEngine.setFlatColor(0.3f, 0.3f, 0.3f);
+            myEngine.updateMvMatrix();
+            cube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+
+        std::vector<std::pair<float,float>> posRoues = {
+            {-2.0f,  2.5f},
+            { 2.0f,  2.5f},
+            {-2.0f, -2.5f},
+            { 2.0f, -2.5f}
+        };
+        for(auto& pos : posRoues){
+            myEngine.mvMatrixStack.pushMatrix();
+                myEngine.mvMatrixStack.addTranslation(Vector3D{pos.first, pos.second, zRoue});
+                myEngine.mvMatrixStack.addRotation(M_PI/2, rt);
+                myEngine.mvMatrixStack.addHomothety(Vector3D{rayonRoue, 0.3f, rayonRoue});
+                myEngine.setFlatColor(0.1f, 0.1f, 0.1f);
+                myEngine.updateMvMatrix();
+                roue->draw();
+            myEngine.mvMatrixStack.popMatrix();
+        }
+
+        myEngine.switchToFlatShading();
+        myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation(Vector3D{0.0f, -4.2f, hauteurCorps + 1.5f});
+            myEngine.setFlatColor(1.0f, 1.0f, 0.8f);
+            myEngine.updateMvMatrix();
+            phare->draw();
+        myEngine.mvMatrixStack.popMatrix();
+        myEngine.switchToPhongShading();
+        myEngine.setLightPosition(Vector4D{state.x, state.y, hauteurCorps + 1.5f, 1.0f}, 2);
+        myEngine.setLightIntensity(Vector3D(80.0f, 80.0f, 50.0f), 2);
+
+    myEngine.mvMatrixStack.popMatrix(); 
 }
 
 void drawFrame() {

@@ -75,6 +75,9 @@ void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods
 		case GLFW_KEY_RIGHT :
 			angle_theta -= 1.0;
 		break;
+		case GLFW_KEY_D:
+			if (is_pressed) handleKeyboardInput('d');
+		break;
 		
 	}
 
