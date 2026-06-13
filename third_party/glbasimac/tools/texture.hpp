@@ -265,13 +265,13 @@ namespace STP3D {
 
 	inline void Texture2D::loadTexture(GLuint target_tex) {
 		last_tex_unit = target_tex;
-		glActiveTextureARB(target_tex);
+		glActiveTexture(target_tex);
 		glBindTexture(GL_TEXTURE_2D,gl_id_tex);
 	}
 
 	inline void Texture2D::unloadTexture(GLuint target_tex) {
 		last_tex_unit = target_tex;
-		glActiveTextureARB(last_tex_unit);
+		glActiveTexture(last_tex_unit);
 		glBindTexture(GL_TEXTURE_2D,0);
 	}
 

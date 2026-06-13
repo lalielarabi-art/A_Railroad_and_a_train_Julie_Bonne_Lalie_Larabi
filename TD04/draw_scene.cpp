@@ -1,5 +1,6 @@
 #include "draw_scene.hpp"
 #include "json.hpp"
+#include "tools/texture.hpp"
 using json = nlohmann::json;
 #include <fstream>
 
@@ -24,7 +25,7 @@ IndexedMesh* balast;
 IndexedMesh* cube;
 IndexedMesh* roue;
 
-
+Texture2D texSol;
 
 float sr{0.5};
 float rr{0.3};
@@ -83,6 +84,10 @@ void initCurvedRail(float r, GLBI_Convex_2D_Shape& bottom, GLBI_Convex_2D_Shape&
 }
 
 void initScene() {
+
+	Texture2D texSol("herbe.tga");
+	texSol.initTexture();
+
 	std::vector<float> points {0.0,0.0,0.0};
 	somePoints.initShape(points);
 
@@ -398,10 +403,15 @@ void drawFrame() {
 
 
 void drawScene() {
-	glPointSize(10.0);
-
-	myEngine.setFlatColor(0.2,0.0,0.0);
+	/*/glPointSize(10.0);
+	texSol.loadTexture();
 	ground.drawShape();
+	texSol.unloadTexture();/*/
+	myEngine.activateTexturing(true);
+		texSol.loadTexture();
+		ground.drawShape();
+		texSol.unloadTexture();
+	myEngine.activateTexturing(false);
 
 	myEngine.setFlatColor(0.0,1.0f,0.0);
 	grid.drawShape();
