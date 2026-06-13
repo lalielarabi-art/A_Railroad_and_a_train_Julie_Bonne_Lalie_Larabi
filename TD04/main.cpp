@@ -45,8 +45,12 @@ void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods
 			break;
 		case GLFW_KEY_P:
 			if (is_pressed) glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-		// TO DO EX01 part 3
-
+		
+		case GLFW_KEY_I:
+            if (is_pressed) {
+                handleKeyboardInput('l'); 
+            }
+            break;
 
 
 		case GLFW_KEY_R :
@@ -71,6 +75,7 @@ void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods
 		case GLFW_KEY_RIGHT :
 			angle_theta -= 1.0;
 		break;
+		
 	}
 
 }
@@ -85,8 +90,14 @@ void onMouseButton(GLFWwindow* window, int button, int action, int /*mods*/)
 	}
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
+	if (argc < 2) {
+        std::cerr << "Erreur : Vous devez specifier le fichier JSON." << std::endl;
+        std::cerr << "Usage : " << argv[0] << "circuit.json" << std::endl;
+        return -1;
+    }
+
 	/* GLFW initialisation */
 	GLFWwindow* window;
 	if (!glfwInit()) return -1;
@@ -126,19 +137,31 @@ int main(int /*argc*/, char** /*argv*/)
 	// TO DO EX01 part 2
 
 	myEngine.mode2D = false; // Set engine to 3D mode
-	myEngine.initGL();
-	onWindowResized(window,WINDOW_WIDTH,WINDOW_HEIGHT);
-	CHECK_GL;
+	
+    myEngine.initGL();
+    onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+    CHECK_GL;
+
+    
+    loadCircuitFromJSON(argv[1]);
+
 
 	initScene();
 	drawFrame();
 	double elapsedTime{0.0};
+	double lastFrameTime = glfwGetTime();
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Get time (in second) at loop beginning */
 		double startTime = glfwGetTime();
+
+		double currentFrameTime = glfwGetTime();
+        float deltaTime = static_cast<float>(currentFrameTime - lastFrameTime);
+        lastFrameTime = currentFrameTime;
+
+		updateScene(deltaTime);
 
 		/* Render begins here */
 		glClearColor(1.0f,1.0f,1.0f,0.0f);
