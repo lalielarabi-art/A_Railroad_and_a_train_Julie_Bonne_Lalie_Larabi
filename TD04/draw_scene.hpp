@@ -32,6 +32,9 @@ void drawScene();
 
 void loadCircuitFromJSON(const std::string& filename);
 
+void updateScene(float deltaTime);
+
+void handleKeyboardInput(unsigned char key);
 struct Position
 {
     int x {0};
