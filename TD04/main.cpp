@@ -7,6 +7,12 @@
 #include <iostream>
 
 
+float camX;
+float camY =-50.0f;
+float camZ = 25.0f ;
+float camAngle = M_PI/2.0f;
+
+
 using namespace glbasimac;
 using namespace STP3D;
 
@@ -28,7 +34,7 @@ void onWindowResized(GLFWwindow* /*window*/, int width, int height)
 {
 	glViewport(0, 0, width, height);
     std::cerr<<"Setting 3D projection"<<std::endl;
-    // TO DO EX01 part 2
+
     myEngine.set3DProjection(90.0, aspectRatio, Z_NEAR, Z_FAR);
 }
 
@@ -36,7 +42,6 @@ void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods
 {
 	int is_pressed = (action == GLFW_PRESS); 
 	switch(key) {
-		case GLFW_KEY_A :
 		case GLFW_KEY_ESCAPE :
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 			break;
@@ -45,40 +50,31 @@ void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods
 			break;
 		case GLFW_KEY_P:
 			if (is_pressed) glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-		
+			break;
 		case GLFW_KEY_I:
             if (is_pressed) {
                 handleKeyboardInput('l'); 
             }
             break;
-
-
-		case GLFW_KEY_R :
-			//> EXO 3
-			//< FIN EXO 3
-			break;
-		case GLFW_KEY_T :
-			//> EXO 3
-			//< FIN EXO 3
-			break;
 		default: std::cerr<<"Touche non gérée "<<key<<std::endl;
-
-		case GLFW_KEY_UP :
-			angle_phy += 1.0;
-		break;
-		case GLFW_KEY_DOWN :
-			angle_phy -= 1.0;
-		break;
-		case GLFW_KEY_LEFT :
-			angle_theta += 1.0;
-		break;
-		case GLFW_KEY_RIGHT :
-			angle_theta -= 1.0;
-		break;
 		case GLFW_KEY_D:
 			if (is_pressed) handleKeyboardInput('d');
 		break;
-		
+		case GLFW_KEY_UP :
+			camX += cos(camAngle) * 0.5f;
+			camY += sin(camAngle) * 0.5f;
+		break;
+		case GLFW_KEY_DOWN :
+			camX -= cos(camAngle) * 0.5f;
+			camY -= sin(camAngle) * 0.5f;
+			break;
+		case GLFW_KEY_LEFT :
+			camAngle += 0.05f;
+			break;
+		case GLFW_KEY_RIGHT :
+			camAngle -= 0.05f;
+			break;
+			
 	}
 
 }
@@ -137,7 +133,7 @@ int main(int argc, char** argv)
 	glfwSetMouseButtonCallback(window, onMouseButton);
 
 	std::cout<<"Engine init"<<std::endl;
-	// TO DO EX01 part 2
+	
 
 	myEngine.mode2D = false; // Set engine to 3D mode
 	
@@ -153,6 +149,7 @@ int main(int argc, char** argv)
 	drawFrame();
 	double elapsedTime{0.0};
 	double lastFrameTime = glfwGetTime();
+	
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -178,12 +175,9 @@ int main(int argc, char** argv)
 
 		/* Fix camera position */
 		myEngine.mvMatrixStack.loadIdentity();
-		Vector3D pos_camera =
-		Vector3D(dist_zoom*cos(deg2rad(angle_theta))*cos(deg2rad(angle_phy)),
-		dist_zoom*sin(deg2rad(angle_theta))*cos(deg2rad(angle_phy)),
-		dist_zoom*sin(deg2rad(angle_phy)));
-		Vector3D viewed_point = Vector3D(0.0,0.0,0.0);
-		Vector3D up_vector = Vector3D(0.0,0.0,1.0);
+		Vector3D pos_camera{camX, camY, camZ};
+		Vector3D viewed_point{camX + cos(camAngle), camY + sin(camAngle), camZ};
+Vector3D up_vector{0.0, 0.0, 1.0};
 		Matrix4D viewMatrix = Matrix4D::lookAt(pos_camera,viewed_point,up_vector);
 		myEngine.setViewMatrix(viewMatrix);
 		myEngine.updateMvMatrix();
