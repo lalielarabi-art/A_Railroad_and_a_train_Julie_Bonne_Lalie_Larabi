@@ -34,8 +34,8 @@ IndexedMesh* balast;
 IndexedMesh* cube;
 IndexedMesh* roue;
 IndexedMesh* phare;
+IndexedMesh* lightSphere; 
 
-IndexedMesh* lightSphere;         
 float lightAngle {0.0f};          
 bool isLightMoving {false};       
 float lightX {-20.0f};             
@@ -426,8 +426,6 @@ void drawCircuit() {
 		drawCurveRail();
 		myEngine.mvMatrixStack.popMatrix();
 	}
-		
-	
 	}
 	}
 
